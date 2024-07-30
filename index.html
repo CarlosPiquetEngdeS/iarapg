@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -504,9 +504,18 @@
 
                 doc.setDrawColor(0);
                 doc.setLineWidth(0.1);
-                doc.rect(margins.left - 0.2, margins.top - 0.2, contentWidth + 0.4, cursorY - margins.top + innermargins + 0.4);
-                
+                doc.rect(margins.left - 0.2, margins.top - 0.2, contentWidth + 0.4, cursorY - margins.top + innerMargins +0.4);
+
                 // Salva o PDF
+                doc.save('relatorio.pdf');
+            };
+
+            // Se a imagem de marca d'água não carregar, ainda salvar o PDF
+            watermarkImg.onerror = function () {
+                doc.setDrawColor(0);
+                doc.setLineWidth(0.1);
+                doc.rect(margins.left - 0.2, margins.top - 0.2, contentWidth + 0.4, cursorY - margins.top + innerMargins + 0.4);
+                
                 doc.save('relatorio.pdf');
             };
         }
