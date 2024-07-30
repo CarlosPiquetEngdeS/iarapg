@@ -47,7 +47,7 @@
         }
 
         .form-container input[type="number"],
-        .form-container input[type="text"] {
+        .form-container select {
             width: 80%;
             padding: 12px;
             border: 2px solid #2649bb;
@@ -67,7 +67,7 @@
         }
 
         .form-container .subject input[type="number"],
-        .form-container .subject input[type="text"] {
+        .form-container .subject select {
             width: 200px;
             display: inline-block;
             margin-right: 2%;
@@ -230,15 +230,54 @@
             const subjectsContainer = document.getElementById('subjectsContainer');
             subjectsContainer.innerHTML = "";
 
+            const subjectOptions = [
+                "Teoria do Direito",
+                "Princípios Institucionais da Advocacia de Estado",
+                "Novas Tendências em Direito Constitucional",
+                "Novas Tendências em Direito Administrativo",
+                "Gestão Pública e Advocacia de Estado",
+                "Assessoria e Consultoria Jurídica em Projetos de Infraestrutura",
+                "Direito e Políticas Públicas",
+                "Direito Ambiental e Sustentabilidade",
+                "Advocacia Pública Fiscal e Tributária",
+                "Sistemas de Integridade Pública e Privada",
+                "Contratos Administrativos e Responsabilidade Civil do Estado",
+                "Fazenda Pública em Juízo",
+                "Métodos Extrajudiciais de Resolução de Conflitos",
+                "Relações Contratuais de Trabalho na Administração Pública",
+                "Regime Jurídico dos Servidores Públicos",
+                "Regime Previdenciário dos Servidores Públicos",
+                "Defesa de Políticas Públicas em Juízo",
+                "Metodologia"
+            ];
+
             for (let i = 1; i <= numSubjects; i++) {
                 const subjectDiv = document.createElement('div');
                 subjectDiv.className = 'subject';
 
-                const subjectNameInput = document.createElement('input');
-                subjectNameInput.type = 'text';
-                subjectNameInput.placeholder = `Nome da Matéria ${i}`;
+                const subjectNameInput = document.createElement('select');
                 subjectNameInput.id = `subjectName${i}`;
+                subjectNameInput.innerHTML = '<option value="">Selecione ou Digite...</option>';
+                subjectOptions.forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option;
+                    opt.textContent = option;
+                    subjectNameInput.appendChild(opt);
+                });
+
+                const customInput = document.createElement('input');
+                customInput.type = 'text';
+                customInput.placeholder = `Nome da Matéria ${i}`;
+                customInput.oninput = function () {
+                    subjectNameInput.value = "";
+                };
+
+                subjectNameInput.onchange = function () {
+                    customInput.value = "";
+                };
+
                 subjectDiv.appendChild(subjectNameInput);
+                subjectDiv.appendChild(customInput);
 
                 const gradeInput = document.createElement('input');
                 gradeInput.type = 'number';
@@ -405,9 +444,10 @@
 
             for (let i = 1; i <= numSubjects; i++) {
                 const subjectNameInput = document.getElementById(`subjectName${i}`);
+                const customInput = subjectNameInput.nextSibling;
                 const gradeInput = document.getElementById(`grade${i}`);
                 const weightInput = document.getElementById(`weight${i}`);
-                const subjectName = subjectNameInput.value || `Matéria ${i}`;
+                const subjectName = subjectNameInput.value || customInput.value || `Matéria ${i}`;
                 const grade = gradeInput.value;
                 const weight = weightInput.value;
                 notes += `${subjectName}: Nota = ${grade}, Peso = ${weight}\n`;
@@ -468,7 +508,8 @@
 
                 // Define a transparência da marca d'água
                 doc.setGState(new doc.GState({ opacity: 0.1 }));
-                doc.addImage(watermarkImgData, 'JPEG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
+                doc.addImage(watermarkImgData, 'JPEG', watermarkX, watermarkY,```html
+                watermarkWidth, watermarkHeight);
                 doc.setGState(new doc.GState({ opacity: 1 })); // Restaura a opacidade padrão
 
                 // Desenhar a borda preta ao redor do conteúdo com margem
@@ -476,7 +517,7 @@
                 doc.setLineWidth(0.1); // Define a largura da linha
                 doc.rect(margins.left - 0.2, margins.top - 0.2, contentWidth + 0.4, cursorY - margins.top + innerMargins + 0.4); // Desenha o retângulo
 
-                // Save the PDF
+                // Salva o PDF
                 doc.save('relatorio.pdf');
             };
         }
