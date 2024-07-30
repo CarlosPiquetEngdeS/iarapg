@@ -10,7 +10,8 @@
         body,
         .form-container,
         .obs-container textarea,
-        .subject input[type="text"] {
+        .subject input[type="text"],
+        .subject select {
             word-wrap: break-word;
             word-break: break-all;
         }
@@ -32,11 +33,9 @@
             color: #cac9c9;
             margin: 0 auto;
             background-color: rgba(8, 8, 8, 0.8);
-            /* Leve transparência */
             padding: 40px;
             border-radius: 15px;
             box-shadow: 0 0px 20px rgba(255, 255, 255, 0.5);
-            /* Transparência no box-shadow */
             flex: 1;
         }
 
@@ -47,13 +46,13 @@
         }
 
         .form-container input[type="number"],
-        .form-container input[type="text"] {
+        .form-container input[type="text"],
+        .form-container select {
             width: 80%;
             padding: 12px;
             border: 2px solid #2649bb;
             border-radius: 10px;
             font-size: 16px;
-            -moz-appearance: textfield;
         }
 
         .form-container input[type="number"]::-webkit-outer-spin-button,
@@ -67,7 +66,8 @@
         }
 
         .form-container .subject input[type="number"],
-        .form-container .subject input[type="text"] {
+        .form-container .subject input[type="text"],
+        .form-container .subject select {
             width: 200px;
             display: inline-block;
             margin-right: 2%;
@@ -90,7 +90,6 @@
 
         .form-container button:hover {
             background-color: #45a049;
-            /* Cor de hover */
         }
 
         #result {
@@ -219,7 +218,6 @@
 
         #numSubjects {
             width: 50px;
-            /* Ajuste a largura do campo Número de Matérias */
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -230,14 +228,60 @@
             const subjectsContainer = document.getElementById('subjectsContainer');
             subjectsContainer.innerHTML = "";
 
+            const subjectOptions = [
+                "Teoria do Direito",
+                "Princípios Institucionais da Advocacia de Estado",
+                "Novas Tendências em Direito Constitucional",
+                "Novas Tendências em Direito Administrativo",
+                "Gestão Pública e Advocacia de Estado",
+                "Assessoria e Consultoria Jurídica em Projetos de Infraestrutura",
+                "Direito e Políticas Públicas",
+                "Direito Ambiental e Sustentabilidade",
+                "Advocacia Pública Fiscal e Tributária (P.Final: 25/10)",
+                "Sistemas de Integridade Pública e Privada",
+                "Contratos Administrativos e Responsabilidade Civil do Estado",
+                "Fazenda Pública em Juízo",
+                "Métodos Extrajudiciais de Resolução de Conflitos",
+                "Relações Contratuais de Trabalho na Administração Pública",
+                "Regime Jurídico dos Servidores Públicos",
+                "Regime Previdenciário dos Servidores Públicos",
+                "Defesa de Políticas Públicas em Juízo",
+                "Metodologia"
+            ];
+
             for (let i = 1; i <= numSubjects; i++) {
                 const subjectDiv = document.createElement('div');
                 subjectDiv.className = 'subject';
 
+                const subjectSelect = document.createElement('select');
+                subjectSelect.id = `subjectSelect${i}`;
+                subjectSelect.onchange = function () {
+                    if (this.value === "Outra") {
+                        document.getElementById(`subjectName${i}`).style.display = 'inline-block';
+                    } else {
+                        document.getElementById(`subjectName${i}`).style.display = 'none';
+                    }
+                };
+
+                subjectOptions.forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option;
+                    opt.textContent = option;
+                    subjectSelect.appendChild(opt);
+                });
+
+                const otherOption = document.createElement('option');
+                otherOption.value = "Outra";
+                otherOption.textContent = "Outra";
+                subjectSelect.appendChild(otherOption);
+
+                subjectDiv.appendChild(subjectSelect);
+
                 const subjectNameInput = document.createElement('input');
                 subjectNameInput.type = 'text';
-                subjectNameInput.placeholder = `Nome da Matéria ${i}`;
+                subjectNameInput.placeholder = `Nome da Matéria`;
                 subjectNameInput.id = `subjectName${i}`;
+                subjectNameInput.style.display = 'none';
                 subjectDiv.appendChild(subjectNameInput);
 
                 const gradeInput = document.createElement('input');
@@ -377,10 +421,9 @@
                 orientation: 'portrait'
             });
 
-            // Configuração das margens
             doc.setFontSize(10);
-            doc.setLineHeightFactor(1.3); // Espaçamento entre linhas
-            doc.setFont('times', 'normal'); // Define a fonte como Times New Roman
+            doc.setLineHeightFactor(1.3);
+            doc.setFont('times', 'normal');
 
             const margins = {
                 top: 1,
@@ -389,7 +432,7 @@
                 right: 1
             };
 
-            const innerMargins = 0.5; // Margem interna para o conteúdo
+            const innerMargins = 0.5;
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
 
@@ -404,10 +447,11 @@
             let notes = "";
 
             for (let i = 1; i <= numSubjects; i++) {
+                const subjectSelect = document.getElementById(`subjectSelect${i}`);
                 const subjectNameInput = document.getElementById(`subjectName${i}`);
                 const gradeInput = document.getElementById(`grade${i}`);
                 const weightInput = document.getElementById(`weight${i}`);
-                const subjectName = subjectNameInput.value || `Matéria ${i}`;
+                const subjectName = subjectSelect.value === "Outra" ? subjectNameInput.value : subjectSelect.value;
                 const grade = gradeInput.value;
                 const weight = weightInput.value;
                 notes += `${subjectName}: Nota = ${grade}, Peso = ${weight}\n`;
@@ -453,30 +497,27 @@
             const img = document.getElementById('imagePreview');
             if (img && img.src) {
                 const imgData = img.src;
-                doc.addImage(imgData, 'JPEG', pageWidth - margins.right - 4.2, margins.top, 4, 3);  // Ajustando a posição da imagem para parte superior direita
+                doc.addImage(imgData, 'JPEG', pageWidth - margins.right - 4.2, margins.top, 4, 3);
             }
 
-            // Adiciona a marca d'água automaticamente
             const watermarkImg = new Image();
             watermarkImg.src = '03.png';
             watermarkImg.onload = function () {
                 const watermarkImgData = watermarkImg.src;
-                const watermarkWidth = contentWidth * 0.5; // Ajuste a largura da marca d'água (50% da largura do conteúdo)
-                const watermarkHeight = watermarkWidth; // Mantém a proporção 1:1
-                const watermarkX = (pageWidth - watermarkWidth) / 2; // Centraliza horizontalmente
-                const watermarkY = (pageHeight - watermarkHeight) / 2; // Centraliza verticalmente
+                const watermarkWidth = contentWidth * 0.5;
+                const watermarkHeight = watermarkWidth;
+                const watermarkX = (pageWidth - watermarkWidth) / 2;
+                const watermarkY = (pageHeight - watermarkHeight) / 2;
 
-                // Define a transparência da marca d'água
                 doc.setGState(new doc.GState({ opacity: 0.1 }));
                 doc.addImage(watermarkImgData, 'JPEG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
-                doc.setGState(new doc.GState({ opacity: 1 })); // Restaura a opacidade padrão
+                doc.setGState(new doc.GState({ opacity: 1 }));
 
-                // Desenhar a borda preta ao redor do conteúdo com margem
-                doc.setDrawColor(0); // Define a cor de desenho como preto
-                doc.setLineWidth(0.1); // Define a largura da linha
-                doc.rect(margins.left - 0.2, margins.top - 0.2, contentWidth + 0.4, cursorY - margins.top + innerMargins + 0.4); // Desenha o retângulo
+                doc.setDrawColor(0);
+                doc.setLineWidth(0.1);
+                doc.rect(margins.left - 0.2, margins.top - 0.2, contentWidth +```html
+0.4, cursorY - margins.top + innerMargins + 0.4);
 
-                // Save the PDF
                 doc.save('relatorio.pdf');
             };
         }
@@ -507,8 +548,7 @@
         <div id="subjectsContainer"></div>
         <div id="addTccContainer"></div>
         <div id="tccFields">
-            <label for="tccGrade1">
-            </label>
+            <label for="tccGrade1">Notas do TCC:</label>
             <div class="tcc-grades">
                 <input type="number" id="tccGrade1" step="0.1" placeholder="Nota 1">
                 <input type="number" id="tccGrade2" step="0.1" placeholder="Nota 2">
@@ -518,8 +558,7 @@
                 <span id="tccResult"></span>
                 <div>
                     <label for="includeTcc">Incluir TCC na média ponderada?</label>
-                    <input type="checkbox" id="includeTcc"
-                        onchange="document.getElementById('tccWeightField').style.display = this.checked ? 'block' : 'none'">
+                    <input type="checkbox" id="includeTcc" onchange="document.getElementById('tccWeightField').style.display = this.checked ? 'block' : 'none'">
                 </div>
                 <div id="tccWeightField">
                     <label for="tccWeight">Peso do TCC:</label>
@@ -538,8 +577,7 @@
             <label for="obs">Observações:</label>
             <textarea id="obs" maxlength="230"></textarea>
             <button type="button" onclick="saveObservations()">Salvar</button>
-            <button type="button" id="removeObsButton" onclick="removeObservations()"
-                style="display:none;">Remover</button>
+            <button type="button" id="removeObsButton" onclick="removeObservations()" style="display:none;">Remover</button>
         </div>
 
         <div id="savedObs" style="font-weight: bold; margin-top: 10px;"></div>
@@ -558,3 +596,4 @@
 </body>
 
 </html>
+            
