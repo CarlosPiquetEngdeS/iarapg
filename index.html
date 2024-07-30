@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -391,10 +391,10 @@
             document.getElementById('removeObsButton').style.display = 'none';
         }
 
-        function generateQRCode(text) {
+        function generateQRCode(text, size = 100) {
             const qr = new QRious({
                 value: text,
-                size: 100
+                size: size
             });
             return qr.toDataURL();
         }
@@ -486,8 +486,8 @@
             }
 
             // Adiciona o QR code ao lado da imagem
-            const qrCodeData = generateQRCode(`Nome: ${studentName}\nTurma: ${studentClass}\n${notes}`);
-            doc.addImage(qrCodeData, 'JPEG', pageWidth - margins.right - 4.2, margins.top + 3.5, 4, 4);
+            const qrCodeData = generateQRCode(`Nome: ${studentName}\nTurma: ${studentClass}\n${notes}`, 50);
+            doc.addImage(qrCodeData, 'JPEG', pageWidth - margins.right - 2, margins.top, 2, 2);
 
             const watermarkImg = new Image();
             watermarkImg.src = '03.png';
@@ -504,7 +504,7 @@
 
                 doc.setDrawColor(0);
                 doc.setLineWidth(0.1);
-                doc.rect(margins.left - 0.2, margins.top - 0.2, contentWidth + 0.4, cursorY - margins.top + innerMargins +0.4);
+                doc.rect(margins.left - 0.2, margins.top - 0.2, contentWidth + 0.4, cursorY - margins.top + innerMargins + 0.4);
 
                 // Salva o PDF
                 doc.save('relatorio.pdf');
