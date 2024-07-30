@@ -10,8 +10,7 @@
         body,
         .form-container,
         .obs-container textarea,
-        .subject input[type="text"],
-        .subject select {
+        .subject input[type="text"] {
             word-wrap: break-word;
             word-break: break-all;
         }
@@ -33,9 +32,11 @@
             color: #cac9c9;
             margin: 0 auto;
             background-color: rgba(8, 8, 8, 0.8);
+            /* Leve transparência */
             padding: 40px;
             border-radius: 15px;
             box-shadow: 0 0px 20px rgba(255, 255, 255, 0.5);
+            /* Transparência no box-shadow */
             flex: 1;
         }
 
@@ -53,6 +54,7 @@
             border: 2px solid #2649bb;
             border-radius: 10px;
             font-size: 16px;
+            -moz-appearance: textfield;
         }
 
         .form-container input[type="number"]::-webkit-outer-spin-button,
@@ -90,6 +92,7 @@
 
         .form-container button:hover {
             background-color: #45a049;
+            /* Cor de hover */
         }
 
         #result {
@@ -218,6 +221,7 @@
 
         #numSubjects {
             width: 50px;
+            /* Ajuste a largura do campo Número de Matérias */
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -237,7 +241,7 @@
                 "Assessoria e Consultoria Jurídica em Projetos de Infraestrutura",
                 "Direito e Políticas Públicas",
                 "Direito Ambiental e Sustentabilidade",
-                "Advocacia Pública Fiscal e Tributária (P.Final: 25/10)",
+                "Advocacia Pública Fiscal e Tributária",
                 "Sistemas de Integridade Pública e Privada",
                 "Contratos Administrativos e Responsabilidade Civil do Estado",
                 "Fazenda Pública em Juízo",
@@ -246,7 +250,7 @@
                 "Regime Jurídico dos Servidores Públicos",
                 "Regime Previdenciário dos Servidores Públicos",
                 "Defesa de Políticas Públicas em Juízo",
-                "Metodologia"
+                "Metodologia",
             ];
 
             for (let i = 1; i <= numSubjects; i++) {
@@ -254,33 +258,33 @@
                 subjectDiv.className = 'subject';
 
                 const subjectSelect = document.createElement('select');
-                subjectSelect.id = `subjectSelect${i}`;
-                subjectSelect.onchange = function () {
-                    if (this.value === "Outra") {
-                        document.getElementById(`subjectName${i}`).style.display = 'inline-block';
-                    } else {
-                        document.getElementById(`subjectName${i}`).style.display = 'none';
-                    }
-                };
+                subjectSelect.id = `subjectName${i}`;
+                const defaultOption = document.createElement('option');
+                defaultOption.value = "";
+                defaultOption.text = `Escolha a Matéria ${i} ou Digite`;
+                subjectSelect.appendChild(defaultOption);
 
-                subjectOptions.forEach(option => {
-                    const opt = document.createElement('option');
-                    opt.value = option;
-                    opt.textContent = option;
-                    subjectSelect.appendChild(opt);
+                subjectOptions.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject;
+                    option.text = subject;
+                    subjectSelect.appendChild(option);
                 });
 
-                const otherOption = document.createElement('option');
-                otherOption.value = "Outra";
-                otherOption.textContent = "Outra";
-                subjectSelect.appendChild(otherOption);
-
+                subjectSelect.onchange = function () {
+                    const otherInput = document.getElementById(`subjectNameOther${i}`);
+                    if (subjectSelect.value === "") {
+                        otherInput.style.display = 'inline-block';
+                    } else {
+                        otherInput.style.display = 'none';
+                    }
+                };
                 subjectDiv.appendChild(subjectSelect);
 
                 const subjectNameInput = document.createElement('input');
                 subjectNameInput.type = 'text';
-                subjectNameInput.placeholder = `Nome da Matéria`;
-                subjectNameInput.id = `subjectName${i}`;
+                subjectNameInput.placeholder = `Outra Matéria ${i}`;
+                subjectNameInput.id = `subjectNameOther${i}`;
                 subjectNameInput.style.display = 'none';
                 subjectDiv.appendChild(subjectNameInput);
 
@@ -298,302 +302,168 @@
                 weightInput.placeholder = 'Peso';
                 weightInput.id = `weight${i}`;
                 weightInput.className = 'peso';
-                subjectDiv.appendChild(weightInput);
+                subjectDiv.appendChild(weight);
 
                 subjectsContainer.appendChild(subjectDiv);
-            }
-
-            const addTccContainer = document.getElementById('addTccContainer');
-            addTccContainer.innerHTML = "";
-
-            const tccCheckbox = document.createElement('input');
-            tccCheckbox.type = 'checkbox';
-            tccCheckbox.id = 'tccCheckbox';
-            tccCheckbox.onchange = function () {
-                const tccFields = document.getElementById('tccFields');
-                tccFields.style.display = this.checked ? 'block' : 'none';
-            };
-
-            const tccLabel = document.createElement('label');
-            tccLabel.textContent = 'Adicionar TCC opcional';
-            tccLabel.htmlFor = 'tccCheckbox';
-
-            addTccContainer.appendChild(tccCheckbox);
-            addTccContainer.appendChild(tccLabel);
-
-            const obsCheckbox = document.createElement('input');
-            obsCheckbox.type = 'checkbox';
-            obsCheckbox.id = 'obsCheckbox';
-            obsCheckbox.onchange = function () {
-                const obsField = document.getElementById('obsField');
-                obsField.style.display = this.checked ? 'block' : 'none';
-            };
-
-            const obsLabel = document.createElement('label');
-            obsLabel.textContent = 'Adicionar Observações';
-            obsLabel.htmlFor = 'obsCheckbox';
-
-            addTccContainer.appendChild(obsCheckbox);
-            addTccContainer.appendChild(obsLabel);
-        }
-
-        function updateSubjectFields() {
-            const numSubjects = parseInt(document.getElementById('numSubjects').value, 10);
-            if (numSubjects >= 1 && numSubjects <= 25) {
-                createSubjectFields(numSubjects);
             }
         }
 
         function calculateAverage() {
-            const numSubjects = parseInt(document.getElementById('numSubjects').value, 10);
+            const numSubjects = document.getElementById('numSubjects').value;
             let totalGrade = 0;
             let totalWeight = 0;
 
             for (let i = 1; i <= numSubjects; i++) {
-                const gradeInput = document.getElementById(`grade${i}`);
-                const weightInput = document.getElementById(`weight${i}`);
+                const subjectSelect = document.getElementById(`subjectName${i}`);
+                const subjectNameOther = document.getElementById(`subjectNameOther${i}`);
+                const subjectName = subjectSelect.value || subjectNameOther.value;
 
-                const grade = parseFloat(gradeInput.value);
-                const weight = parseFloat(weightInput.value);
+                const grade = parseFloat(document.getElementById(`grade${i}`).value);
+                const weight = parseFloat(document.getElementById(`weight${i}`).value);
 
-                if (!isNaN(grade) && !isNaN(weight) && weight > 0) {
+                if (!isNaN(grade) && !isNaN(weight)) {
                     totalGrade += grade * weight;
                     totalWeight += weight;
                 }
             }
 
-            const tccCheckbox = document.getElementById('tccCheckbox');
-            let tccAverage = 0;
+            const average = totalWeight === 0 ? 0 : (totalGrade / totalWeight).toFixed(2);
+            document.getElementById('result').innerText = `Média Ponderada: ${average}`;
+            document.getElementById('result').style.display = 'block';
+        }
 
-            if (tccCheckbox && tccCheckbox.checked) {
-                const tccGrade1 = parseFloat(document.getElementById('tccGrade1').value);
-                const tccGrade2 = parseFloat(document.getElementById('tccGrade2').value);
-                const tccGrade3 = parseFloat(document.getElementById('tccGrade3').value);
+        function toggleFields() {
+            const calculatorType = document.querySelector('input[name="calculatorType"]:checked').value;
+            const tccFields = document.getElementById('tccFields');
+            const obsField = document.getElementById('obsField');
+            const tccWeightField = document.getElementById('tccWeightField');
 
-                if (!isNaN(tccGrade1) && !isNaN(tccGrade2) && !isNaN(tccGrade3)) {
-                    tccAverage = (tccGrade1 + tccGrade2 + tccGrade3) / 3;
-                    document.getElementById('tccResult').textContent = `Média do TCC: ${tccAverage.toFixed(2)}`;
-                    document.getElementById('tccResultField').style.display = 'block';
-
-                    const includeTcc = document.getElementById('includeTcc').checked;
-                    if (includeTcc) {
-                        const tccWeight = parseFloat(document.getElementById('tccWeight').value);
-                        if (!isNaN(tccWeight) && tccWeight > 0) {
-                            totalGrade += tccAverage * tccWeight;
-                            totalWeight += tccWeight;
-                        }
-                    }
-                }
+            if (calculatorType === 'tcc') {
+                tccFields.style.display = 'block';
+                obsField.style.display = 'none';
+                tccWeightField.style.display = 'block';
+            } else if (calculatorType === 'observacao') {
+                obsField.style.display = 'block';
+                tccFields.style.display = 'none';
+                tccWeightField.style.display = 'none';
+            } else {
+                tccFields.style.display = 'none';
+                obsField.style.display = 'none';
+                tccWeightField.style.display = 'none';
             }
-
-            const average = totalWeight > 0 ? totalGrade / totalWeight : 0;
-            const averageElement = document.getElementById('average');
-            averageElement.textContent = `Resultado Média Ponderada: ${average.toFixed(2)}`;
-
-            const result = document.getElementById('result');
-            result.style.display = 'block';
         }
 
-        function saveObservations() {
-            const observationsField = document.getElementById('obs');
-            if (observationsField.value.length > 230) {
-                alert('As observações não podem exceder 230 caracteres.');
-                return;
+        function saveObservation() {
+            const observation = document.getElementById('observation').value;
+            savedObservations += observation + "\n";
+            document.getElementById('savedObservations').innerText = savedObservations;
+        }
+
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function () {
+                const imagePreview = document.getElementById('imagePreview');
+                imagePreview.src = reader.result;
+                imagePreview.style.display = 'block';
             }
-            savedObservations = observationsField.value;
-            document.getElementById('savedObs').textContent = savedObservations;
-            document.getElementById('removeObsButton').style.display = 'inline-block';
-            alert('Observações salvas com sucesso!');
+            reader.readAsDataURL(event.target.files[0]);
         }
 
-        function removeObservations() {
-            savedObservations = "";
-            document.getElementById('savedObs').textContent = "";
-            document.getElementById('obs').value = "";
-            document.getElementById('removeObsButton').style.display = 'none';
-        }
-
-        async function generatePDF() {
+        function exportToPDF() {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({
-                unit: 'cm',
-                format: 'a4',
-                orientation: 'portrait'
-            });
+            const doc = new jsPDF();
 
-            doc.setFontSize(10);
-            doc.setLineHeightFactor(1.3);
-            doc.setFont('times', 'normal');
+            let yOffset = 10;
 
-            const margins = {
-                top: 1,
-                bottom: 2,
-                left: 2,
-                right: 1
-            };
+            const title = "Relatório de Média Ponderada";
+            doc.setFontSize(18);
+            doc.text(title, 105, yOffset, { align: "center" });
+            yOffset += 10;
 
-            const innerMargins = 0.5;
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
-
-            const contentWidth = pageWidth - margins.left - margins.right;
-            const contentHeight = pageHeight - margins.top - margins.bottom;
-
-            let cursorY = margins.top + innerMargins;
-
-            const studentName = document.getElementById('studentName').value;
-            const studentClass = document.getElementById('studentClass').value;
-            const numSubjects = parseInt(document.getElementById('numSubjects').value, 10);
-            let notes = "";
+            const numSubjects = document.getElementById('numSubjects').value;
 
             for (let i = 1; i <= numSubjects; i++) {
-                const subjectSelect = document.getElementById(`subjectSelect${i}`);
-                const subjectNameInput = document.getElementById(`subjectName${i}`);
-                const gradeInput = document.getElementById(`grade${i}`);
-                const weightInput = document.getElementById(`weight${i}`);
-                const subjectName = subjectSelect.value === "Outra" ? subjectNameInput.value : subjectSelect.value;
-                const grade = gradeInput.value;
-                const weight = weightInput.value;
-                notes += `${subjectName}: Nota = ${grade}, Peso = ${weight}\n`;
+                const subjectSelect = document.getElementById(`subjectName${i}`);
+                const subjectNameOther = document.getElementById(`subjectNameOther${i}`);
+                const subjectName = subjectSelect.value || subjectNameOther.value;
+
+                const grade = document.getElementById(`grade${i}`).value;
+                const weight = document.getElementById(`weight${i}`).value;
+
+                doc.setFontSize(12);
+                doc.text(`Matéria ${i}: ${subjectName}`, 10, yOffset);
+                yOffset += 6;
+                doc.text(`Nota: ${grade}, Peso: ${weight}`, 10, yOffset);
+                yOffset += 10;
             }
 
-            const average = document.getElementById('average').textContent;
-
-            doc.setFontSize(20);
-            doc.text('Relatório de Médias', margins.left + innerMargins, cursorY);
+            const average = document.getElementById('result').innerText;
             doc.setFontSize(14);
-            cursorY += 1.2;
-            doc.text(`Nome do Aluno:`, margins.left + innerMargins, cursorY);
-            cursorY += 0.5;
-            doc.text(`${studentName}`, margins.left + innerMargins, cursorY);
-            cursorY += 1.2;
-            doc.text(`Turma: ${studentClass}`, margins.left + innerMargins, cursorY);
-            cursorY += 1.2;
-            doc.text(average, margins.left + innerMargins, cursorY);
-            cursorY += 1.0;
-            doc.text(`Notas:`, margins.left + innerMargins, cursorY);
-            cursorY += 1.0;
-            const splitNotes = notes.split("\n");
-            splitNotes.forEach(note => {
-                doc.text(note, margins.left + innerMargins, cursorY);
-                cursorY += 0.7;
-            });
+            doc.text(average, 10, yOffset);
 
-            if (document.getElementById('tccCheckbox').checked) {
-                const tccAverage = parseFloat(document.getElementById('tccResult').textContent.split(': ')[1]);
-                doc.text(`Média do TCC: ${tccAverage.toFixed(2)}`, margins.left + innerMargins, cursorY);
-                cursorY += 1.2;
-            }
+            const observation = document.getElementById('savedObservations').innerText;
+            yOffset += 10;
+            doc.text("Observações:", 10, yOffset);
+            yOffset += 6;
+            doc.setFontSize(12);
+            doc.text(observation, 10, yOffset);
 
-            if (savedObservations) {
-                const splitObservations = doc.splitTextToSize(`Observações: ${savedObservations}`, contentWidth - 2 * innerMargins);
-                cursorY += 0.5;
-                splitObservations.forEach(line => {
-                    doc.text(line, margins.left + innerMargins, cursorY);
-                    cursorY += 0.5;
-                });
-            }
-
-            const img = document.getElementById('imagePreview');
-            if (img && img.src) {
-                const imgData = img.src;
-                doc.addImage(imgData, 'JPEG', pageWidth - margins.right - 4.2, margins.top, 4, 3);
-            }
-
-            const watermarkImg = new Image();
-            watermarkImg.src = '03.png';
-            watermarkImg.onload = function () {
-                const watermarkImgData = watermarkImg.src;
-                const watermarkWidth = contentWidth * 0.5;
-                const watermarkHeight = watermarkWidth;
-                const watermarkX = (pageWidth - watermarkWidth) / 2;
-                const watermarkY = (pageHeight - watermarkHeight) / 2;
-
-                doc.setGState(new doc.GState({ opacity: 0.1 }));
-                doc.addImage(watermarkImgData, 'JPEG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
-                doc.setGState(new doc.GState({ opacity: 1 }));
-
-                doc.setDrawColor(0);
-                doc.setLineWidth(0.1);
-                doc.rect(margins.left - 0.2, margins.top - 0.2, contentWidth +```html
-0.4, cursorY - margins.top + innerMargins + 0.4);
-
-                doc.save('relatorio.pdf');
-            };
-        }
-
-        function handleImageUpload(event, previewId) {
-            const file = event.target.files[0];
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const imgElement = document.getElementById(previewId);
-                imgElement.src = e.target.result;
-                imgElement.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
+            doc.save("relatorio.pdf");
         }
     </script>
 </head>
 
 <body>
     <div class="form-container">
-        <h1>MÉDIA PONDERADA</h1>
-        <label for="studentName">Nome do Aluno:</label>
-        <input type="text" id="studentName" class="turma" required>
-        <label for="studentClass">Turma:</label>
-        <input type="text" id="studentClass" class="turma" required>
-        <label for="numSubjects">Número de Matérias:</label>
-        <input type="number" id="numSubjects" min="1" max="25" onchange="updateSubjectFields()" required>
+        <h1>Calculadora de Média Ponderada</h1>
+        <div class="calculator-type">
+            <label><input type="radio" name="calculatorType" value="normal" onclick="toggleFields()"> Normal</label>
+            <label><input type="radio" name="calculatorType" value="tcc" onclick="toggleFields()"> TCC</label>
+            <label><input type="radio" name="calculatorType" value="observacao" onclick="toggleFields()"> Observação</label>
+        </div>
+
+        <div class="turma">
+            <label for="numSubjects">Número de Matérias:</label>
+            <input type="number" id="numSubjects" oninput="createSubjectFields(this.value)">
+        </div>
 
         <div id="subjectsContainer"></div>
-        <div id="addTccContainer"></div>
+
         <div id="tccFields">
-            <label for="tccGrade1">Notas do TCC:</label>
             <div class="tcc-grades">
-                <input type="number" id="tccGrade1" step="0.1" placeholder="Nota 1">
-                <input type="number" id="tccGrade2" step="0.1" placeholder="Nota 2">
-                <input type="number" id="tccGrade3" step="0.1" placeholder="Nota 3">
+                <label for="tccScore">Nota TCC:</label>
+                <input type="number" id="tccScore" step="0.1">
             </div>
-            <div id="tccResultField">
-                <span id="tccResult"></span>
-                <div>
-                    <label for="includeTcc">Incluir TCC na média ponderada?</label>
-                    <input type="checkbox" id="includeTcc" onchange="document.getElementById('tccWeightField').style.display = this.checked ? 'block' : 'none'">
-                </div>
-                <div id="tccWeightField">
-                    <label for="tccWeight">Peso do TCC:</label>
-                    <input type="number" id="tccWeight" step="0.1">
-                </div>
+            <div id="tccWeightField">
+                <label for="tccWeight">Peso TCC:</label>
+                <input type="number" id="tccWeight" step="0.1">
             </div>
+        </div>
+
+        <div id="obsField">
+            <div class="obs-container">
+                <textarea id="observation" placeholder="Digite suas observações..."></textarea>
+                <button type="button" onclick="saveObservation()">Salvar Observação</button>
+            </div>
+            <p>Observações Salvas:</p>
+            <pre id="savedObservations"></pre>
         </div>
 
         <button type="button" onclick="calculateAverage()">Calcular Média</button>
-
-        <div id="result">
-            <span id="average"></span>
-        </div>
-
-        <div id="obsField" class="obs-container">
-            <label for="obs">Observações:</label>
-            <textarea id="obs" maxlength="230"></textarea>
-            <button type="button" onclick="saveObservations()">Salvar</button>
-            <button type="button" id="removeObsButton" onclick="removeObservations()" style="display:none;">Remover</button>
-        </div>
-
-        <div id="savedObs" style="font-weight: bold; margin-top: 10px;"></div>
+        <div id="result"></div>
 
         <div class="image-container">
-            <label for="imageUpload">Carregar Imagem</label>
-            <input type="file" id="imageUpload" accept="image/*" onchange="handleImageUpload(event, 'imagePreview')">
-            <img id="imagePreview" class="image-preview" style="display: none;">
+            <label for="fileInput">Carregar Imagem:</label>
+            <input type="file" id="fileInput" accept="image/*" onchange="previewImage(event)">
+            <img id="imagePreview" class="image-preview" alt="Pré-visualização da Imagem" style="display:none;">
         </div>
 
-        <button type="button" onclick="generatePDF()">Gerar PDF</button>
+        <button type="button" onclick="exportToPDF()">Exportar para PDF</button>
     </div>
+
     <div class="rodape-flutuante">
-        Calculadora de Média Ponderada e Relatório - Desenvolvida por Carlos Antonio Oliveira Piquet.
+        Carlos Antonio Oliveira Piquet
     </div>
 </body>
 
 </html>
-            
