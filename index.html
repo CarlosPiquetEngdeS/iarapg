@@ -489,12 +489,12 @@
             const img = document.getElementById('imagePreview');
             if (img && img.src) {
                 const imgData = img.src;
-                doc.addImage(imgData, 'JPEG', margins.left, margins.top, 4, 3); // Alinha a imagem à esquerda
+                doc.addImage(imgData, 'JPEG', margins.right + 10, margins.top, 4, 3); // Alinha a imagem à direita
             }
 
-            // Adiciona o QR code ao lado da imagem
+            // Adiciona o QR code abaixo da imagem
             const qrCodeData = generateQRCode(`Nome: ${studentName}\nTurma: ${studentClass}\n${notes}`, 50);
-            doc.addImage(qrCodeData, 'JPEG', margins.left + 4.2, margins.top, 2, 2); // Alinha o QR code à direita da imagem
+            doc.addImage(qrCodeData, 'JPEG', margins.right + 10, margins.top + 4.2, 2, 2); // Alinha o QR code abaixo da imagem
 
             const watermarkImg = new Image();
             watermarkImg.src = '03.png';
@@ -511,7 +511,7 @@
 
                 doc.setDrawColor(0);
                 doc.setLineWidth(0.1);
-                doc.rect(margins.left - 0.2, margins.top - 0.2, contentWidth + 0.4, cursorY - margins.top + innerMargins + 0.4); // Ajusta a borda ao redor do conteúdo
+                doc.rect(margins.left - 0.2, margins.top - 0.2, contentwidth + 0.4, cursorY - margins.top + innerMargins + 0.4); // Ajusta a borda ao redor do conteúdo
                 doc.save('relatorio.pdf');
             };
 
@@ -598,5 +598,3 @@
     </div>
 </body>
 </html>
-
-
