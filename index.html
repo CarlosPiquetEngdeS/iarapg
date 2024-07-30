@@ -73,6 +73,11 @@
             margin-right: 2%;
         }
 
+        /* Adicionando a regra CSS para reduzir o tamanho da fonte nos campos de nome da matéria */
+        .form-container .subject input[type="text"] {
+            font-size: 13px;
+        }
+
         .form-container button {
             display: block;
             width: 70%;
@@ -497,7 +502,8 @@
                 doc.setDrawColor(0); // Define a cor de desenho como preto
                 doc.setLineWidth(0.1); // Define a largura da linha
                 doc.rect(margins.left - 0.2, margins.top - 0.2, contentWidth + 0.4, cursorY - margins.top + innerMargins + 0.4); // Desenha o retângulo
-                // Save the PDF
+                
+                // Salva o PDF
                 doc.save('relatorio.pdf');
             };
         }
@@ -523,7 +529,7 @@
         <label for="studentClass">Turma:</label>
         <input type="text" id="studentClass" class="turma" required>
         <label for="numSubjects">Número de Matérias:</label>
-        <input type="number" id="numSubjects" min="1" max="18" onchange="updateSubjectFields()" required>
+        <input type="number" id="numSubjects" min="1" max="25" onchange="updateSubjectFields()" required>
 
         <div id="subjectsContainer"></div>
         <div id="addTccContainer"></div>
