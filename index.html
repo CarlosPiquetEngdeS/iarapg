@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MÉDIA PONDERADA</title>
+
     <style>
         body,
         .form-container,
@@ -34,7 +35,6 @@
             border-radius: 15px;
             box-shadow: 0 0px 20px rgba(255, 255, 255, 0.5);
             flex: 1;
-            position: relative;
         }
 
         .form-container label {
@@ -153,7 +153,6 @@
         .image-container {
             position: relative;
             margin-top: 20px;
-            text-align: center;
         }
 
         .image-container input[type="file"] {
@@ -185,8 +184,6 @@
             max-height: 100px;
             display: block;
             margin-top: 10px;
-            margin-left: auto;
-            margin-right: auto;
         }
 
         h1 {
@@ -222,26 +219,6 @@
 
         #numSubjects {
             width: 50px;
-        }
-
-        .pdf-content {
-            text-align: left;
-        }
-
-        .pdf-notes {
-            font-weight: bold;
-        }
-
-        .top-right-container {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            text-align: right;
-        }
-
-        .top-right-container img {
-            display: block;
-            margin-bottom: 10px;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -505,12 +482,12 @@
             const img = document.getElementById('imagePreview');
             if (img && img.src) {
                 const imgData = img.src;
-                doc.addImage(imgData, 'JPEG', margins.right + 12, margins.top, 4, 3); // Alinha a imagem à direita
+                doc.addImage(imgData, 'JPEG', margins.left, margins.top, 4, 3); // Alinha a imagem à esquerda
             }
 
-            // Adiciona o QR code abaixo da imagem
+            // Adiciona o QR code ao lado da imagem
             const qrCodeData = generateQRCode(`Nome: ${studentName}\nTurma: ${studentClass}\n${notes}`, 50);
-            doc.addImage(qrCodeData, 'JPEG', margins.right + 12, margins.top + 4.2, 2, 2); // Alinha o QR code abaixo da imagem
+            doc.addImage(qrCodeData, 'JPEG', margins.left + 4.2, margins.top, 2, 2); // Alinha o QR code à direita da imagem
 
             const watermarkImg = new Image();
             watermarkImg.src = '03.png';
@@ -519,7 +496,7 @@
                 const watermarkWidth = contentWidth * 0.5;
                 const watermarkHeight = watermarkWidth;
                 const watermarkX = (pageWidth - watermarkWidth) / 2;
-                const watermarkY =(pageHeight - watermarkHeight) / 2;
+                const watermarkY = (pageHeight - watermarkHeight) / 2;
 
                 doc.setGState(new doc.GState({ opacity: 0.1 }));
                 doc.addImage(watermarkImgData, 'JPEG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
@@ -536,18 +513,9 @@
                 doc.setDrawColor(0);
                 doc.setLineWidth(0.1);
                 doc.rect(margins.left - 0.2, margins.top - 0.2, contentWidth + 0.4, cursorY - margins.top + innerMargins + 0.4);
+                
                 doc.save('relatorio.pdf');
             };
-
-            // Para garantir que o PDF seja salvo mesmo se a imagem de marca d'água não carregar
-            setTimeout(() => {
-                if (!doc.internal.hasImage(watermarkImg.src)) {
-                    doc.setDrawColor(0);
-                    doc.setLineWidth(0.1);
-                    doc.rect(margins.left - 0.2, margins.top - 0.2, contentWidth + 0.4, cursorY - margins.top + innerMargins + 0.4);
-                    doc.save('relatorio.pdf');
-                }
-            }, 3000);
         }
 
         function handleImageUpload(event, previewId) {
@@ -565,10 +533,6 @@
 
 <body>
     <div class="form-container">
-        <div class="top-right-container">
-            <img id="imagePreview" class="image-preview" style="display: none;">
-            <canvas id="qrCodeCanvas"></canvas>
-        </div>
         <h1>MÉDIA PONDERADA</h1>
         <label for="studentName">Nome do Aluno:</label>
         <input type="text" id="studentName" class="turma" required>
