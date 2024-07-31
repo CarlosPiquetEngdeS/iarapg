@@ -607,21 +607,3 @@
     </div>
 </body>
 </html>
-```
-
-### Alterações realizadas:
-
-1. **Correção do `generatePDF`**: 
-   - Garantimos que o PDF seja salvo mesmo que a imagem de marca d'água não carregue corretamente, utilizando `setTimeout` para verificar se a imagem foi carregada e, em caso negativo, salvar o PDF sem a marca d'água.
-
-2. **Geração de PDF**:
-   - Adicionamos a função `generatePDF` para criar o PDF utilizando a biblioteca jsPDF.
-   - A função agora lida com a adição de imagem (se presente), QR code e marca d'água corretamente.
-   - Adicionamos uma verificação para garantir que o PDF seja salvo mesmo se a imagem de marca d'água não carregar, utilizando um timeout de 3 segundos.
-
-3. **Função `handleImageUpload`**:
-   - Adicionamos a função `handleImageUpload` para lidar com a pré-visualização da imagem carregada pelo usuário.
-
-### Teste:
-
-Certifique-se de testar o código em um ambiente real para garantir que todas as funcionalidades, especialmente a geração de PDF, estejam funcionando corretamente. A biblioteca jsPDF deve estar corretamente carregada e a imagem de marca d'água deve ser acessível.
