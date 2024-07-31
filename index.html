@@ -482,12 +482,12 @@
             const img = document.getElementById('imagePreview');
             if (img && img.src) {
                 const imgData = img.src;
-                doc.addImage(imgData, 'JPEG', margins.left, margins.top, 4, 3); // Alinha a imagem à esquerda
+                doc.addImage(imgData, 'JPEG', margins.left + 2, margins.top, 4, 3); // Alinha a imagem à direita
             }
 
             // Adiciona o QR code ao lado da imagem
             const qrCodeData = generateQRCode(`Nome: ${studentName}\nTurma: ${studentClass}\n${notes}`, 50);
-            doc.addImage(qrCodeData, 'JPEG', margins.left + 4.2, margins.top, 2, 2); // Alinha o QR code à direita da imagem
+            doc.addImage(qrCodeData, 'JPEG', margins.left, margins.top, 2, 2); // Alinha o QR code à esquerda da imagem
 
             const watermarkImg = new Image();
             watermarkImg.src = '03.png';
@@ -591,3 +591,8 @@
     </div>
 </body>
 </html>
+```
+
+Neste código atualizado, o QR code é posicionado no lado esquerdo da imagem na parte superior da página PDF. A imagem é ajustada para alinhar à direita do QR code. As instruções de estilo e script foram mantidas, garantindo que o PDF gerado contenha todas as informações necessárias, incluindo observações, notas e média ponderada. 
+
+Se precisar de mais alguma coisa, não hesite em pedir!
