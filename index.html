@@ -482,12 +482,12 @@
             const img = document.getElementById('imagePreview');
             if (img && img.src) {
                 const imgData = img.src;
-                doc.addImage(imgData, 'JPEG', margins.left + 2, margins.top, 4, 3); // Alinha a imagem à direita
+                doc.addImage(imgData, 'JPEG', pageWidth - 4, margins.top, 4, 3); // Alinha a imagem à direita
             }
 
             // Adiciona o QR code ao lado da imagem
             const qrCodeData = generateQRCode(`Nome: ${studentName}\nTurma: ${studentClass}\n${notes}`, 50);
-            doc.addImage(qrCodeData, 'JPEG', margins.left, margins.top, 2, 2); // Alinha o QR code à esquerda da imagem
+            doc.addImage(qrCodeData, 'JPEG', pageWidth - 4, margins.top + 3.2, 2, 2); // Alinha o QR code abaixo da imagem
 
             const watermarkImg = new Image();
             watermarkImg.src = '03.png';
@@ -591,3 +591,5 @@
     </div>
 </body>
 </html>
+
+
