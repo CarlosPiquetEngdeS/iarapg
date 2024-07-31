@@ -391,9 +391,10 @@
             document.getElementById('removeObsButton').style.display = 'none';
         }
 
-        function generateQRCode(text, size = 100) {
+        function generateQRCode(name, turma, grades, average, size = 100) {
+            const qrText = `Nome: ${name}\nTurma: ${turma}\nNotas:\n${grades}\nMédia: ${average}`;
             const qr = new QRious({
-                value: text,
+                value: qrText,
                 size: size
             });
             return qr.toDataURL();
@@ -442,7 +443,7 @@
                 notes += `${subjectName}: Nota = ${grade}, Peso = ${weight}\n`;
             }
 
-            const average = document.getElementById('average').textContent;
+            const average = document.getElementById('average').textContent.split(': ')[1];
 
             doc.setFontSize(20);
             doc.text('Relatório de Médias', margins.left + innerMargins, cursorY);
@@ -454,7 +455,7 @@
             cursorY += 1.2;
             doc.text(`Turma: ${studentClass}`, margins.left + innerMargins, cursorY);
             cursorY += 1.2;
-            doc.text(average, margins.left + innerMargins, cursorY);
+            doc.text(`Resultado Média Ponderada: ${average}`, margins.left + innerMargins, cursorY);
             cursorY += 1.0;
             doc.text(`Notas:`, margins.left + innerMargins, cursorY);
             cursorY += 1.0;
@@ -486,7 +487,7 @@
             }
 
             // Adiciona o QR code ao lado da imagem
-            const qrCodeData = generateQRCode(`Nome: ${studentName}\nTurma: ${studentClass}\n${notes}`, 50);
+            const qrCodeData = generateQRCode(studentName, studentClass, notes, average, 50);
             doc.addImage(qrCodeData, 'JPEG', pageWidth - 4, margins.top + 3.2, 2, 2); // Alinha o QR code abaixo da imagem
 
             const watermarkImg = new Image();
@@ -504,92 +505,84 @@
 
                 doc.setDrawColor(0);
                 doc.setLineWidth(0.1);
-                doc.rect(margins.left - 0.2, margins.top - 0.2, contentWidth + 0.4, cursorY - margins.top + innerMargins + 0.4); // Ajusta a borda ao redor do conteúdo
-                doc.save('relatorio.pdf');
-            };
+                doc.line(margins.left, pageHeight - margins.bottom, pageWidth - margins.right, pageHeight - margins.bottom);
 
-            // Se a imagem de marca d'água não carregar, ainda salvar o PDF
-            watermarkImg.onerror = function () {
-                doc.setDrawColor(0);
-                doc.setLineWidth(0.1);
-                doc.rect(margins.left - 0.2, margins.top - 0.2, contentWidth + 0.4, cursorY - margins.top + innerMargins + 0.4);
-                
-                doc.save('relatorio.pdf');
+                doc.setFontSize(10);
+                doc.setFont('times', 'italic');
+                doc.text('ESCOLA SUPERIOR DE ADVOCACIA PÚBLICA', pageWidth - margins.right, pageHeight - margins.bottom + 0.5, {
+                    align: 'right'
+                });
+
+                doc.save('Relatorio_Medias.pdf');
             };
         }
 
-        function handleImageUpload(event, previewId) {
-            const file = event.target.files[0];
+        function handleFileUpload(event) {
             const reader = new FileReader();
             reader.onload = function (e) {
-                const imgElement = document.getElementById(previewId);
-                imgElement.src = e.target.result;
-                imgElement.style.display = 'block';
+                const img = document.getElementById('imagePreview');
+                img.src = e.target.result;
+                img.style.display = 'block';
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(event.target.files[0]);
         }
+
+        window.onload = function () {
+            document.getElementById('generatePDF').addEventListener('click', generatePDF);
+            document.getElementById('fileUpload').addEventListener('change', handleFileUpload);
+        };
     </script>
 </head>
-
 <body>
     <div class="form-container">
         <h1>MÉDIA PONDERADA</h1>
         <label for="studentName">Nome do Aluno:</label>
-        <input type="text" id="studentName" class="turma" required>
+        <input type="text" id="studentName" placeholder="Nome do Aluno" required>
         <label for="studentClass">Turma:</label>
-        <input type="text" id="studentClass" class="turma" required>
+        <input type="text" id="studentClass" placeholder="Turma" class="turma" required>
         <label for="numSubjects">Número de Matérias:</label>
-        <input type="number" id="numSubjects" min="1" max="25" onchange="updateSubjectFields()" required>
-
+        <input type="number" id="numSubjects" min="1" max="25" value="18" onchange="updateSubjectFields()">
         <div id="subjectsContainer"></div>
         <div id="addTccContainer"></div>
         <div id="tccFields">
-            <label for="tccGrade1">Notas do TCC:</label>
+            <h3>Notas do TCC</h3>
             <div class="tcc-grades">
-                <input type="number" id="tccGrade1" step="0.1" placeholder="Nota 1">
-                <input type="number" id="tccGrade2" step="0.1" placeholder="Nota 2">
-                <input type="number" id="tccGrade3" step="0.1" placeholder="Nota 3">
+                <input type="number" id="tccGrade1" placeholder="Nota 1" step="0.1">
+                <input type="number" id="tccGrade2" placeholder="Nota 2" step="0.1">
+                <input type="number" id="tccGrade3" placeholder="Nota 3" step="0.1">
+            </div>
+            <div>
+                <input type="checkbox" id="includeTcc">
+                <label for="includeTcc">Incluir TCC no cálculo da média</label>
+            </div>
+            <div id="tccWeightField">
+                <label for="tccWeight">Peso do TCC:</label>
+                <input type="number" id="tccWeight" step="0.1" placeholder="Peso do TCC">
             </div>
             <div id="tccResultField">
-                <span id="tccResult"></span>
-                <div>
-                    <label for="includeTcc">Incluir TCC na média ponderada?</label>
-                    <input type="checkbox" id="includeTcc" onchange="document.getElementById('tccWeightField').style.display = this.checked ? 'block' : 'none'">
-                </div>
-                <div id="tccWeightField">
-                    <label for="tccWeight">Peso do TCC:</label>
-                    <input type="number" id="tccWeight" step="0.1">
-                </div>
+                <p id="tccResult"></p>
             </div>
         </div>
-
-        <button type="button" onclick="calculateAverage()">Calcular Média</button>
-
-        <div id="result">
-            <span id="average"></span>
-        </div>
-
         <div id="obsField" class="obs-container">
             <label for="obs">Observações:</label>
-            <textarea id="obs" maxlength="230"></textarea>
-            <button type="button" onclick="saveObservations()">Salvar</button>
-            <button type="button" id="removeObsButton" onclick="removeObservations()" style="display:none;">Remover</button>
+            <textarea id="obs" placeholder="Digite as observações (máximo 230 caracteres)"></textarea>
+            <button type="button" onclick="saveObservations()">Salvar Observações</button>
+            <button type="button" id="removeObsButton" onclick="removeObservations()" style="display:none;">Remover Observações</button>
+            <p id="savedObs" style="color: white;"></p>
         </div>
-
-        <div id="savedObs" style="font-weight: bold; margin-top: 10px;"></div>
-
+        <button type="button" onclick="calculateAverage()">Calcular Média</button>
+        <div id="result">
+            <p id="average"></p>
+        </div>
         <div class="image-container">
-            <label for="imageUpload">Carregar Imagem</label>
-            <input type="file" id="imageUpload" accept="image/*" onchange="handleImageUpload(event, 'imagePreview')">
+            <label for="fileUpload">Upload de Imagem</label>
+            <input type="file" id="fileUpload" accept="image/*">
             <img id="imagePreview" class="image-preview" style="display: none;">
         </div>
-
-        <button type="button" onclick="generatePDF()">Gerar PDF</button>
+        <button type="button" id="generatePDF">Gerar PDF</button>
     </div>
     <div class="rodape-flutuante">
-        Calculadora de Média Ponderada e Relatório - Desenvolvida por Carlos Antonio Oliveira Piquet.
+        <p style="text-align: center;">Desenvolvido por Carlos Antonio de Oliveira Piquet</p>
     </div>
 </body>
 </html>
-
-
