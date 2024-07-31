@@ -481,7 +481,8 @@
             }
 
             const img = document.getElementById('imagePreview');
-            if (img && img.src) {
+            if
+                (img && img.src) {
                 const imgData = img.src;
                 doc.addImage(imgData, 'JPEG', pageWidth - 6, margins.top, 4, 3); // Alinha a imagem à direita
             }
@@ -527,9 +528,16 @@
             reader.readAsDataURL(event.target.files[0]);
         }
 
+        function toggleTccWeightField() {
+            const includeTccCheckbox = document.getElementById('includeTcc');
+            const tccWeightField = document.getElementById('tccWeightField');
+            tccWeightField.style.display = includeTccCheckbox.checked ? 'block' : 'none';
+        }
+
         window.onload = function () {
             document.getElementById('generatePDF').addEventListener('click', generatePDF);
             document.getElementById('fileUpload').addEventListener('change', handleFileUpload);
+            toggleTccWeightField(); // Adicione esta linha
         };
     </script>
 </head>
@@ -552,7 +560,7 @@
                 <input type="number" id="tccGrade3" placeholder="Nota 3" step="0.1">
             </div>
             <div>
-                <input type="checkbox" id="includeTcc">
+                <input type="checkbox" id="includeTcc" onchange="toggleTccWeightField()">
                 <label for="includeTcc">Incluir TCC no cálculo da média</label>
             </div>
             <div id="tccWeightField">
