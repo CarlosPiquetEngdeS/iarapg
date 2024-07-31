@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MÉDIA PONDERADA</title>
-
     <style>
         body,
         .form-container,
@@ -219,6 +218,14 @@
 
         #numSubjects {
             width: 50px;
+        }
+
+        .pdf-content {
+            text-align: left;
+        }
+
+        .pdf-notes {
+            font-weight: bold;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -591,3 +598,6 @@
     </div>
 </body>
 </html>
+```
+
+Com estas alterações, o código HTML deve estar configurado para gerar corretamente o relatório PDF com a imagem e o QR code posicionados corretamente à direita da imagem. A função `generatePDF` trata da inserção da imagem e do QR code, garantindo que ambos sejam alinhados lado a lado no relatório PDF gerado.
