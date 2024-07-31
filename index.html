@@ -34,6 +34,7 @@
             border-radius: 15px;
             box-shadow: 0 0px 20px rgba(255, 255, 255, 0.5);
             flex: 1;
+            position: relative;
         }
 
         .form-container label {
@@ -152,6 +153,7 @@
         .image-container {
             position: relative;
             margin-top: 20px;
+            text-align: center;
         }
 
         .image-container input[type="file"] {
@@ -183,6 +185,8 @@
             max-height: 100px;
             display: block;
             margin-top: 10px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         h1 {
@@ -226,6 +230,18 @@
 
         .pdf-notes {
             font-weight: bold;
+        }
+
+        .top-right-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+        }
+
+        .top-right-container img {
+            display: block;
+            margin-bottom: 10px;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -489,12 +505,12 @@
             const img = document.getElementById('imagePreview');
             if (img && img.src) {
                 const imgData = img.src;
-                doc.addImage(imgData, 'JPEG', margins.right + 10, margins.top, 4, 3); // Alinha a imagem à direita
+                doc.addImage(imgData, 'JPEG', margins.right + 12, margins.top, 4, 3); // Alinha a imagem à direita
             }
 
             // Adiciona o QR code abaixo da imagem
             const qrCodeData = generateQRCode(`Nome: ${studentName}\nTurma: ${studentClass}\n${notes}`, 50);
-            doc.addImage(qrCodeData, 'JPEG', margins.right + 10, margins.top + 4.2, 2, 2); // Alinha o QR code abaixo da imagem
+            doc.addImage(qrCodeData, 'JPEG', margins.right + 12, margins.top + 4.2, 2, 2); // Alinha o QR code abaixo da imagem
 
             const watermarkImg = new Image();
             watermarkImg.src = '03.png';
@@ -503,7 +519,7 @@
                 const watermarkWidth = contentWidth * 0.5;
                 const watermarkHeight = watermarkWidth;
                 const watermarkX = (pageWidth - watermarkWidth) / 2;
-                const watermarkY = (pageHeight - watermarkHeight) / 2;
+                const watermarkY =(pageHeight - watermarkHeight) / 2;
 
                 doc.setGState(new doc.GState({ opacity: 0.1 }));
                 doc.addImage(watermarkImgData, 'JPEG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
@@ -511,7 +527,7 @@
 
                 doc.setDrawColor(0);
                 doc.setLineWidth(0.1);
-                doc.rect(margins.left - 0.2, margins.top - 0.2, contentdoc.rect(margins.left - 0.2, margins.top - 0.2, contentWidth + 0.4, cursorY - margins.top + innerMargins + 0.4); // Ajusta a borda ao redor do conteúdo
+                doc.rect(margins.left - 0.2, margins.top - 0.2, contentWidth + 0.4, cursorY - margins.top + innerMargins + 0.4); // Ajusta a borda ao redor do conteúdo
                 doc.save('relatorio.pdf');
             };
 
@@ -549,6 +565,10 @@
 
 <body>
     <div class="form-container">
+        <div class="top-right-container">
+            <img id="imagePreview" class="image-preview" style="display: none;">
+            <canvas id="qrCodeCanvas"></canvas>
+        </div>
         <h1>MÉDIA PONDERADA</h1>
         <label for="studentName">Nome do Aluno:</label>
         <input type="text" id="studentName" class="turma" required>
@@ -607,3 +627,20 @@
     </div>
 </body>
 </html>
+```
+
+### Alterações Realizadas
+
+1. **CSS**:
+   - Adicionada a classe `.top-right-container` para posicionar os elementos no canto superior direito.
+   - Modificada a classe `.image-preview` para centralizar a imagem dentro da div.
+
+2. **HTML**:
+   - Adicionada a div `.top-right-container` dentro da `.form-container` para conter a imagem e o QR code.
+   - Adicionados IDs para a imagem (`imagePreview`) e o canvas do QR code (`qrCodeCanvas`).
+
+3. **JavaScript**:
+   - Ajustada a posição da imagem e do QR code no PDF para que sejam alinhados ao canto superior direito.
+   - Alterado o código para adicionar o QR code ao canvas dentro da div `.top-right-container`.
+
+Essas alterações garantem que a imagem e o QR code sejam exibidos corretamente no canto superior direito tanto na visualização da página web quanto no PDF gerado.
